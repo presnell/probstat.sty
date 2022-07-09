@@ -1,0 +1,409 @@
+%%% Should add options for vectors to be denoted in various ways,
+%%% e.g., with bold or not, arrows on top, arrows on bottom, whatever.
+%%% Maybe do same for matrices and so forth.
+%%% 
+%%% Changes 2022/07/08
+%%% 
+%%% Ran into a conflict with the newtxmath package, which now includes
+%%% a new version of the \widebar command that I was already using.
+%%% So I am loading the newtxmath package and hoping that it doesn't
+%%% break anything else.
+%%% 
+%%% Changes 2019/08/25
+%%% 
+%%% I decided to change the definition of \suchthat to produce
+%%% s.t. rather than \backepsilon.  I'll have to look out for places
+%%% where this might break something.  I didn't include an \xspace
+%%% because there should always be a space after this and I'm leaving
+%%% it to the user to enter the space they want manually.  I may
+%%% decide to change this.
+%%% 
+%%% Changes 2019/08/09
+%%% 
+%%% I kept running into clashes with \varprod, which is already
+%%% defined in various places (txfonts, pxfonts, newtxmath,
+%%% newpxmath).  So I'm just using \bigtimes instead.  The default
+%%% does not really look good, so it's best to also load something
+%%% like newtxmath.
+%%% 
+%%% Changes 2010/06/18
+%%% 
+%%% A. Decided to change all uses of \mathscr to \mathcal and leave it
+%%% to the user to load the calrsfs package if they want the rsfs font
+%%% for \mathcal.  Basically I think that using the two different
+%%% calligraphic/cursive fonts in a single document is probably a
+%%% mistake.  Part of my reasoning is that I would say, e.g., "script
+%%% F" for both \mathcal{F} and \mathscr{F}.
+%%% 
+%%% Changes 2009/11/10
+%%% 
+%%% A. Decided to incorporate the mathtools package, which includes
+%%% several things that I had duplicated here and which does some of
+%%% them in a better way that I believe will be back-compatible with
+%%% my old defintions. In particular, mathtools:
+%%% 
+%%% 1) includes A. R. Perlis's \mathllap, etc., with improvements, so
+%%% I no longer need to include this.
+%%% 
+%%% 2) includes a mechanism for defining paired delimiters (like \abs,
+%%% \norm, \ceil, \floor, etc) that includes what I had before (an
+%%% optional argument where one could specify \big, etc) and also
+%%% defines a starred version that automatically puts in \left and
+%%% \right.
+%%%
+%%% Note that mathtools requires and passes options to amsmath, so I
+%%% no longer need to require amsmath here.
+%%%
+%%% Read the mathtools documentation to see the other useful macros
+%%% and environments defined there.
+%%% 
+%%% B. Decided to use bm.sty and redefine \vec, \svec, and \mat
+%%% appropriately. \svec is not really needed anymore but I'm leaving
+%%% it in for backwards compatibility.
+
+\DeclareOption*{%
+  \PassOptionsToPackage{\CurrentOption}{mathtools}%
+}
+
+\ProcessOptions
+
+%% There is no \ReDeclareMathOperator command to match amsmath's
+%% \DeclareMathOperator, so let's define one here:
+\newcommand\ReDeclareMathOperator[2]{\renewcommand{#1}{\operatorname{#2}}}
+
+\RequirePackage{mathtools}
+\RequirePackage{amsfonts}
+\RequirePackage{amssymb}
+% \RequirePackage{mathrsfs}
+\RequirePackage{bm}
+\RequirePackage{stmaryrd}
+\RequirePackage{xspace}
+% \RequirePackage{centernot}
+
+%% % \newcommand{\wbar}[1]{\overline{#1}} % This is ugly.
+\RequirePackage{accents} % Used in my limit theory notes, so still needed.
+%% % \newcommand{\wbar}{\accentset{{\cc@style\underline{\mskip10mu}}}}
+%% % \newcommand{\widebar}[1]{\accentset{\rule{0.5em}{0.4pt}}{#1}}
+%% %%% Definition of widebar taken from rjwmath.sty and modified slightly.
+%% \newlength{\widebarargwidth}
+%% \newlength{\widebarwidth}
+%% \newlength{\widebarargheight}
+%% \newlength{\widebarargdepth}
+%% \DeclareRobustCommand{\widebar}[1]{%
+%%   \settowidth{\widebarargwidth}{\ensuremath{#1}}%
+%%   \settoheight{\widebarargheight}{\ensuremath{#1}}%
+%%   \settodepth{\widebarargdepth}{\ensuremath{#1}}%
+%%   \addtolength{\widebarargwidth}{-0.2\widebarargheight}%
+%%   \addtolength{\widebarargwidth}{-0.2\widebarargdepth}%
+%%   \makebox[0pt][l]{\addtolength{\widebarargheight}{0.3ex}%
+%%     \hspace{0.2\widebarargheight}%
+%%     \hspace{0.2\widebarargdepth}%
+%%     \hspace{0.45\widebarargwidth}%
+%%     \setlength{\widebarwidth}{0.9\widebarargwidth}%
+%%     \addtolength{\widebarwidth}{0.3ex}%
+%%     \makebox[0pt][c]{\rule[\widebarargheight]{\widebarwidth}{0.1ex}}}%
+%%   {#1}}
+%%% 
+%%% An updated and improved version of the \widebar command below is
+%%% now included in the newtxmath package.  I'm going to try just
+%%% loading that package and hoping that it doesn't break anything
+%%% else.
+%% %%% 
+%% %%% This may be the best \widebar solution that I've found yet.
+%% %%% Requires the amsmath package (no problem).  Taken from 
+%% %%%
+%% %%% http://tex.stackexchange.com/questions/16337/can-i-get-a-widebar-without-using-the-mathabx-package
+%% %%%
+%% \makeatletter
+%% \newcommand*\rel@kern[1]{\kern#1\dimexpr\macc@kerna}
+%% \newcommand*\widebar[1]{%
+%%   \begingroup
+%%   \def\mathaccent##1##2{%
+%%     \rel@kern{0.8}%
+%%     \overline{\rel@kern{-0.8}\macc@nucleus\rel@kern{0.2}}%
+%%     \rel@kern{-0.2}%
+%%   }%
+%%   \macc@depth\@ne
+%%   \let\math@bgroup\@empty \let\math@egroup\macc@set@skewchar
+%%   \mathsurround\z@ \frozen@everymath{\mathgroup\macc@group\relax}%
+%%   \macc@set@skewchar\relax
+%%   \let\mathaccentV\macc@nested@a
+%%   \macc@nested@a\relax111{#1}%
+%%   \endgroup
+%% }
+%% \makeatother
+\RequirePackage{newtxmath}  % Includes \widebar
+\newcommand{\wbar}[1]{\widebar{#1}} % Just for backwards
+%                                 % compatability.  Use \widebar.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Donald Arseneau
+% Probabilistic independence symbol (comp.text.tex, June 2000) 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+\newcommand{\nullifyqed}{\renewcommand{\qed}{}}
+\newcommand{\primed}{$\,'$}
+\renewcommand{\emptyset}{\varnothing}
+\newcommand{\powerset}[1]{2^{#1}}
+
+\renewcommand{\Omega}{\varOmega}
+\renewcommand{\Theta}{\varTheta}
+\renewcommand{\Lambda}{\varLambda}
+
+%% \implies is defined in amsmath package as 
+%% \newcommand{\implies}{\DOTSB\;\Longrightarrow\;}
+% \newcommand{\Implies}{\DOTSB\,\Longrightarrow\,}
+%% Do I use this shorter version anywhere?
+\newcommand{\Implies}{\DOTSB\,\Rightarrow\,}
+\newcommand{\Forall}{\forall\,}
+\newcommand{\Exists}{\exists\,}
+
+\newcommand{\nimplies}{\centernot\implies}
+
+\newcommand{\class}[1]{\mathcal{#1}}
+%\newcommand{\class}[1]{\mathscr{#1}}
+\newcommand{\minalg}{\mathcal{A}}
+%\newcommand{\minalg}{\mathcal{F}}
+%\newcommand{\minlambda}{\mathcal{L}}
+\newcommand{\minlambda}{\lambda}
+\newcommand{\rect}{\text{Rect}}
+
+% \newcommand{\defeq}{\overset{\text{def}}{=}}
+\newcommand{\defeq}{\mathrel{\vcentcolon=}}
+\newcommand{\eqdef}{\mathrel{=\vcentcolon}}
+\newcommand{\eqae}{\mathrel{\overset{\text{a.e.}}{=}}}
+\newcommand{\eqas}{\mathrel{\overset{\text{a.s.}}{=}}}
+\newcommand{\eqindist}{\mathrel{\overset{\text{d}}{=}}}
+\newcommand{\eqinlaw}{\mathrel{\overset{\law}{=}}}
+
+%%% Replacing these with new versions using \xrightarrow
+% \newcommand{\cvginprob}{\overset{P}{\rightarrow}}
+% \newcommand{\cvginmeas}[1][\mu]{\overset{#1}{\rightarrow}}
+% \newcommand{\cvgas}{\overset{\text{a.s.}}{\longrightarrow}}
+% \newcommand{\cvgac}{\overset{\text{a.c.}}{\longrightarrow}}
+% \newcommand{\cvgL}[1]{\overset{L^{#1}}{\longrightarrow}}
+% \newcommand{\cvgL}[1][p]{\overset{L^{#1}}{\longrightarrow}}
+% \newcommand{\cvgindist}{\overset{\text{d}}{\longrightarrow}}
+% \newcommand{\cvgvaguely}{\overset{v}{\longrightarrow}}
+
+\newcommand{\cvginprob}[1][\Pr]{\xrightarrow{#1}}
+\newcommand{\cvginmeas}[1][\mu]{\xrightarrow{#1}}
+\newcommand{\cvgas}{\xrightarrow{\text{a.s.}}}
+\newcommand{\cvgac}{\xrightarrow{\text{a.c.}}}
+\newcommand{\cvgL}[1][p]{\xrightarrow{L^{#1}}}
+\newcommand{\cvgindist}{\xrightarrow{\text{d}}}
+%\newcommand{\law}{\mathscr{L}}
+\newcommand{\law}{\mathcal{L}}
+\newcommand{\cvginlaw}{\overset{\law}{\longrightarrow}}
+\newcommand{\cvgvaguely}{\xrightarrow{v}}
+% \newcommand{\cvgweakly}{\Rightarrow}
+\newcommand{\cvgweakly}{\rightsquigarrow}
+
+%% Negated convergences.
+\newcommand{\nto}{\nrightarrow}
+\newcommand{\ncvginprob}[1][\Pr]{\arrownot\cvginprob[#1]}
+\newcommand{\ncvginmeas}[1][\mu]{\arrownot\cvginmeas[#1]}
+\newcommand{\ncvgas}{\arrownot\cvgas}
+\newcommand{\ncvgac}{\arrownot\cvgac}
+% \newcommand{\ncvgL}[1][p]{\longarrownot\cvgL[#1]}
+\newcommand{\ncvgL}[1][p]{\Arrownot\cvgL[#1]}
+\newcommand{\ncvgindist}{\Arrownot\cvgindist}
+\newcommand{\ncvgvaguely}{\arrownot\cvgvaguely}
+\newcommand{\ncvgweakly}{\Arrownot\cvgweakly}
+
+\newcommand{\op}{o_{P}}
+\newcommand{\Op}{O_{P}}
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}          % Absolute value
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}         % Norm          
+\DeclarePairedDelimiter{\enorm}{\lVert}{\rVert}        % Euclidean norm        
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}      % Floor function
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}         % Ceiling function
+\DeclarePairedDelimiter{\innerprod}{\langle}{\rangle}  % Inner product
+\newcommand{\given}{\vert}
+
+\newcommand{\sigmafield}{$\sigma$-field\xspace}
+\newcommand{\sfield}{$\sigma$-field\xspace}
+
+\newcommand{\reals}{\mathbb{R}}            % Real numbers
+% \newcommand{\xreals}{\mathbb{\wbar{R}}}    % Extended Real numbers
+\newcommand{\xreals}{\wbar{\mathbb{R}}}    % Extended Real numbers
+\newcommand{\posreals}{\reals_{+}}     % Real numbers
+\newcommand{\xposreals}{\xreals_{+}}   % Extended Real numbers
+
+\newcommand{\rationals}{\mathbb{Q}}        % Rational numbers
+\newcommand{\naturals}{\mathbb{N}}         % Natural numbers
+\newcommand{\integers}{\mathbb{Z}}         % Integers
+\newcommand{\complex}{\mathbb{C}}          % Complex numbers
+
+\newcommand{\borel}{\class{B}}
+\newcommand{\rBorel}[1][{}]{\class{R}^{#1}}
+\newcommand{\xrBorel}[1][{}]{\class{\wbar{R}}^{#1}}
+\newcommand{\posrBorel}[1][{}]{\class{R}_{+}^{#1}}
+\newcommand{\xposrBorel}[1][{}]{\class{\wbar{R}_{+}}^{#1}}
+% \newcommand{\rborel}[1][{}]{\class{R}^{#1}}
+% \newcommand{\xrborel}[1][{}]{\class{\wbar{R}}^{#1}}
+\newcommand{\rborel}{\class{R}}
+\newcommand{\xrborel}{\class{\wbar{R}}}
+
+\newcommand{\Pempirical}{\mathbb{P}}
+
+\newcommand{\into}{\rightarrow}
+% \newcommand{\into}{\longrightarrow}
+\newcommand{\onto}{\xrightarrow{\text{onto}}}
+
+\renewcommand{\vec}[1]{\bm{#1}}
+\newcommand{\svec}[1]{\bm{#1}}
+\newcommand{\rvec}[3][1]{#2_{#1},\dots,#2_{#3}}
+\newcommand{\rvecp}[3][1]{(#2_{#1},\dots,#2_{#3})}
+\newcommand{\mat}[1]{\bm{#1}}
+
+\newcommand{\wrt}{w.r.t.\xspace}
+% I changed the name of the following macro from \st to \suchthat,
+% because the former conflicted with a macro from soul.sty.
+% \newcommand{\suchthat}{\ensuremath{\text{s.t.}}}
+% \newcommand{\suchthat}{\ensuremath{\backepsilon}}
+\newcommand{\suchthat}{\text{s.t.}\xspace}
+\newcommand{\ac}{\text{a.c.}\xspace}
+\newcommand{\Ae}{\text{a.e.}\xspace}
+\newcommand{\aew}{\text{a.e.}\xspace}
+\newcommand{\as}{\text{a.s.}\xspace}
+\newcommand{\io}{\ensuremath{\text{i.o.}}}
+\newcommand{\almostall}{\ensuremath{\text{a.a.}}}
+
+% Riemann integral
+%\newcommand{\rint}{\mbox{\small R}\!\int}
+%\newcommand{\rint}{\rlap{r}\int}
+%\newcommand{\rint}{\mathop{\mathrlap{\scriptscriptstyle\mathfrak{R}}\int}}
+%\newcommand{\rint}{\mathrlap{\scriptscriptstyle\mathfrak{R}}\int}
+% \newcommand{\rint}{\sideset{_{\mathfrak{R}}}{}\int}
+% \RequirePackage{stmaryrd}
+% \newcommand{\rint}{\mathop{\Rbag}}
+% \newcommand{\rint}{\mathop{\mathfrak{R}}}
+% \newcommand{\rint}{\mathfrak{R}}
+% \newcommand{\rint}{\oint}
+% \newcommand{\rint}{R\int}
+% \newcommand{\rint}{\mathrlap{\scriptstyle{R}}\int}
+\newcommand{\rint}{\mathrlap{\scriptstyle{R}}\,\int}
+% \newcommand{\rint}{\mathrlap{\scriptstyle{R}}\mathchoice{}{\,}{\,}{\,}\int}
+
+\DeclareMathOperator{\var}{Var}
+\DeclareMathOperator{\avar}{AVar}
+\DeclareMathOperator{\cov}{Cov}
+\DeclareMathOperator{\cor}{Corr}
+\DeclareMathOperator{\sd}{sd}
+\DeclareMathOperator{\se}{se}
+\DeclareMathOperator{\ARE}{ARE}
+\DeclareMathOperator{\bias}{Bias}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\range}{range}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\atan}{atan}
+\DeclareMathOperator*{\arctanh}{arctanh}
+%% \DeclareMathOperator*{\Realpart}{Re}
+%% \DeclareMathOperator*{\Imagpart}{Im}
+\DeclareMathOperator*{\rpart}{Re}
+\DeclareMathOperator*{\ipart}{Im}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator{\vecop}{vec}
+\DeclareMathOperator{\logit}{logit}
+\DeclareMathOperator{\expit}{expit}
+\DeclareMathOperator{\li}{li}   % the logarithmic integral function
+
+\newcommand{\tp}[1]{#1^T}
+
+\newcommand{\Xbar}{\wbar{X}}
+\newcommand{\xbar}{\wbar{x}}
+\newcommand{\Ybar}{\wbar{Y}}
+\newcommand{\ybar}{\wbar{y}}
+\providecommand{\Zbar}{}       % Defined differently elsewhere as
+\renewcommand{\Zbar}{\wbar{Z}} % British style "zed" (crossed z).
+\newcommand{\zbar}{\wbar{z}}
+\newcommand{\smom}[1]{\overline{#1}}
+\newcommand{\Xsqbar}{\overline{X^2}}
+\newcommand{\Ysqbar}{\overline{Y^2}}
+\newcommand{\XYbar}{\overline{XY}}
+\newcommand{\sigmabar}{\wbar{\sigma}}
+\newcommand{\muouter}{\mu^{*}}
+\newcommand{\lambdaouter}{\lambda^{*}}
+\newcommand{\mubar}{\wbar{\mu}}
+
+\newcommand{\tbigcup}{\mathop{\textstyle\bigcup}}
+\newcommand{\tbigcap}{\mathop{\textstyle\bigcap}}
+\newcommand{\tbiguplus}{\mathop{\textstyle\biguplus}}
+\newcommand{\tbigtimes}{\mathop{\textstyle\bigtimes}}
+\newcommand{\tprod}{\mathop{\textstyle\prod}}
+\newcommand{\tsum}{\mathop{\textstyle\sum}}
+\newcommand{\tint}{\mathop{\textstyle\int}}
+
+%\newcommand{\symdiff}{\bigtriangleup}
+\newcommand{\symdiff}{\mathop{\vartriangle}}
+
+\newcommand{\nuac}{\nu_{\text{ac}}}
+\newcommand{\nus}{\nu_{\text{s}}}
+
+% \DeclareMathOperator*{\closure}{cl}
+% \DeclareMathOperator*{\interior}{int}
+% \newcommand{\closure}[1]{\wbar{#1}}
+% \newcommand{\closure}[1]{\Bar{#1}}
+% \newcommand{\closure}[1]{\overline{#1}}
+\newcommand{\closure}[1]{\widebar{#1}}
+\newcommand{\interior}[1]{#1^{\circ}}
+% \newcommand{\interior}[1]{\overset{\circ}{#1}}
+\newcommand{\boundary}[1]{\partial{#1}}
+\newcommand{\conjugate}[1]{\overline{#1}}
+
+\newcommand{\pfrac}[2]{\genfrac{(}{)}{}{}{#1}{#2}}
+\newcommand{\dderiv}[3][]{\frac{d^{#1} #2}{d #3^{#1}}}
+\newcommand{\pderiv}[3][]{\frac{\partial^{#1} #2}{\partial {#3}^{#1}}}
+\newcommand{\ppderiv}[3]{\frac{\partial^2 #1}{\partial #2\, \partial #3}}
+\newcommand{\rdderiv}[3][]{d^{#1} #2/d #3^{#1}}
+\newcommand{\rpderiv}[3][]{\partial^{#1} #2/\partial #3^{#1}}
+\newcommand{\rppderiv}[3]{\partial^2 #1 /\partial #2 \partial #3}
+
+\newcommand{\tdderiv}[3][]{\tfrac{d^{#1} #2}{d #3^{#1}}}
+\newcommand{\tpderiv}[3][]{\tfrac{\partial^{#1} #2}{\partial {#3}^{#1}}}
+\newcommand{\tppderiv}[3]{\tfrac{\partial^2 #1}{\partial #2\, \partial #3}}
+\newcommand{\ddderiv}[3][]{\dfrac{d^{#1} #2}{d #3^{#1}}}
+\newcommand{\dpderiv}[3][]{\dfrac{\partial^{#1} #2}{\partial {#3}^{#1}}}
+\newcommand{\dppderiv}[3]{\dfrac{\partial^2 #1}{\partial #2\, \partial #3}}
+
+\newcommand{\half}{\tfrac{1}{2}}
+\newcommand{\third}{\tfrac{1}{3}}
+\newcommand{\fourth}{\tfrac{1}{4}}
+
+\DeclareMathOperator{\nasymnormal}{AN}
+\DeclareMathOperator{\nbernoulli}{Bernoulli}
+\DeclareMathOperator{\nbeta}{Beta}
+\DeclareMathOperator{\nbetabinomial}{BetaBin}
+\DeclareMathOperator{\nbinomial}{Bin}
+\DeclareMathOperator{\ncauchy}{Cauchy}
+\DeclareMathOperator{\ndirichlet}{Dirichlet}
+\DeclareMathOperator{\ndirichletmultinom}{DMN}
+\DeclareMathOperator{\nexp}{Exp}
+\DeclareMathOperator{\ngamma}{Gamma}
+\DeclareMathOperator{\ngeometric}{Geom}
+\DeclareMathOperator{\nnegativebinomial}{NegBin}
+\DeclareMathOperator{\nmultinomial}{MN}
+\DeclareMathOperator{\npoisson}{Poisson}
+\DeclareMathOperator{\nunif}{Unif}
+
+\DeclareMathOperator{\mse}{MSE}
+\DeclareMathOperator{\rmse}{RMSE}
+\DeclareMathOperator{\ise}{ISE}
+\DeclareMathOperator{\mise}{MISE}
+\DeclareMathOperator{\amise}{AMISE}
+\DeclareMathOperator{\lscv}{LSCV}
+
+\newcommand{\Ho}{\ensuremath{\text{H}_{0}}\xspace}
+\newcommand{\Ha}{\ensuremath{\text{H}_{a}}\xspace}
+\newcommand{\iid}{\ensuremath{\text{i.i.d.}}\xspace}
+
+\newcommand{\pvalue}{\text{p-value}}
+\newcommand{\pvalues}{\text{p-values}}
